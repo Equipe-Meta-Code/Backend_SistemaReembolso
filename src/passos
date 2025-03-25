@@ -1,0 +1,12 @@
+passo a passo de criação
+
+npm init -y
+npm install typescript @types/express @types/mongoose --save-dev
+npm install typescript@latest --save-dev // nao precisa instalar tps de novo
+npx tsc --init
+
+
+
+
+npm i express mongoose
+npm install nodemon -D
