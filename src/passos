@@ -1,4 +1,4 @@
-passo a passo de criação
+passo a passo
 
 npm init -y
 npm install typescript @types/express @types/mongoose --save-dev
