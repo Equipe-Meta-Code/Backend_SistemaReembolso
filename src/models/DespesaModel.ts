@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const DespesaSchema = new mongoose.Schema({
+  projetoId: {
+    type: Number,
+    required: true
+  },
   categoria: {
     type: String,
     required: true
