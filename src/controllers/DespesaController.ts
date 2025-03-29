@@ -11,4 +11,13 @@ export default class DespesaController {
             res.status(500).json({ error: 'Erro ao criar despesa' });
         }
     }
+
+    async getAll(req: Request, res: Response) {
+        try {
+            const despesas = await DespesaModel.find();
+            res.status(200).json(despesas);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao buscar despesas' });
+        }
+    }
 }

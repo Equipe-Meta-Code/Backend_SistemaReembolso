@@ -8,6 +8,7 @@ const router = express.Router()
 const controller = new DespesaController()
 
 router.post("/despesa", controller.create);
+router.get("/despesa", controller.getAll);
 
 // Rotas do Usuário
 router.post("/register", UserController.register);
