@@ -5,6 +5,10 @@ const DespesaSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  userId: {
+    type: Number,
+    required: true
+  },
   categoria: {
     type: String,
     required: true
@@ -21,6 +25,10 @@ const DespesaSchema = new mongoose.Schema({
   descricao: {
     type: String,
     required: false
+  },
+  aprovacao: {
+    type: String,
+    required: true
   }
 });
 
