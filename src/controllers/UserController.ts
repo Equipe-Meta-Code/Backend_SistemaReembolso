@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 interface AuthRequest extends Request {
-    user?: string;
+    user?: number;
 }
 
 class UserController {
@@ -36,7 +36,7 @@ class UserController {
         });
 
         // Send the response
-        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.id });
+        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId });
     });
 
     // Login
@@ -62,7 +62,7 @@ class UserController {
         res.json({
             message: "Login sucesso",
             token,
-            id: user._id,
+            id: user.userId,
             name: user.name,
             email: user.email,
         });
@@ -71,7 +71,10 @@ class UserController {
     // Profile
     static profile = asyncHandler(async (req: AuthRequest, res: Response) => {
         // Find the user
-        const user = await User.findById(req.user).select("-password");
+        const user = await User.findById({ userId: req.user }).select("-password");
+        if (!user) {
+            throw new Error("Usuário não encontrado.");
+        }
         res.json({ user });
     });
 }
