@@ -83,3 +83,12 @@ export default class ProjetoController {
     }
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const projetos = await ProjetoModel.find();
+      res.status(200).json(projetos);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar projetos." });
+    }
+  }
+}
