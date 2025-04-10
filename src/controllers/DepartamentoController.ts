@@ -18,4 +18,12 @@ export default class DepartamentoController {
     }
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const departamentos = await DepartamentoModel.find();
+      res.status(200).json(departamentos);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar departamentos", details: error });
+    }
+  }
 }

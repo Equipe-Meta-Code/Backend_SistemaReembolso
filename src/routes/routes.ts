@@ -19,10 +19,13 @@ router.put("/despesa/:id", despesaController.aprovarDespesas);
 
 
 router.post("/projeto", projetoController.create);
+router.get("/projeto", projetoController.getAll);
 
 router.post("/departamentos", departamentoController.create);
+router.get("/departamentos", departamentoController.getAll);
 
 router.post("/categorias", categoriaController.create);
+router.get("/categorias", categoriaController.getAll);
 
 // Rotas do Usuário
 router.post("/register", UserController.register);

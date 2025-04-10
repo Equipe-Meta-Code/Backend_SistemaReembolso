@@ -18,5 +18,12 @@ export default class CategoriaController {
     }
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const categorias = await CategoriaModel.find();
+      res.status(200).json(categorias);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar categorias", details: error });
+    }
   }
 }
