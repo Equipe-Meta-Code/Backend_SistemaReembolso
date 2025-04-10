@@ -14,5 +14,6 @@ router.get("/despesa", controller.getAll);
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.get("/profile", isAuthenticated, UserController.profile);
+router.get("/userList", UserController.userList);
 
 export { router };
