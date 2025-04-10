@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const DespesaSchema = new mongoose.Schema({
   projetoId: {

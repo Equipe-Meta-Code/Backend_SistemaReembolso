@@ -5,10 +5,10 @@ import isAuthenticated from "../middlewares/isAuth";
 const express = require('express')
 const router = express.Router()
 
-const controller = new DespesaController()
+const despesaController = new DespesaController()
 
-router.post("/despesa", controller.create);
-router.get("/despesa", controller.getAll);
+router.post("/despesa", despesaController.create);
+router.get("/despesa", despesaController.getAll);
 
 // Rotas do Usuário
 router.post("/register", UserController.register);
