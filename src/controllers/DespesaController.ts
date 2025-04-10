@@ -20,4 +20,29 @@ export default class DespesaController {
             res.status(500).json({ error: 'Erro ao buscar despesas' });
         }
     }
+
+    async aprovarDespesas(req: Request, res: Response) {
+        const { id } = req.params;
+        const { aprovacao } = req.body;
+        
+        if (!aprovacao) {
+            return res.status(400).json({ error: 'Campo aprovação é obrigatório' });
+        }
+        
+        try {
+            const despesaAtualizada = await DespesaModel.findByIdAndUpdate(
+                id,
+                { aprovacao },
+                { new: true }
+            );
+            
+            if (!despesaAtualizada) {
+                return res.status(404).json({ error: 'Despesa não encontrada' });
+            }
+            
+            res.status(200).json(despesaAtualizada);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao atualizar aprovação da despesa' });
+        }
+    }
 }

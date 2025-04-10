@@ -9,6 +9,7 @@ const despesaController = new DespesaController()
 
 router.post("/despesa", despesaController.create);
 router.get("/despesa", despesaController.getAll);
+router.put("/despesa/:id", despesaController.aprovarDespesas);
 
 // Rotas do Usuário
 router.post("/register", UserController.register);
