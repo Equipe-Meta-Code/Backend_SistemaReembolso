@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const DespesaSchema = new mongoose.Schema({
+  despesaId: {
+    type: Number,
+    unique:true
+  },
   projetoId: {
     type: Number,
     required: true
@@ -29,9 +33,15 @@ const DespesaSchema = new mongoose.Schema({
   },
   aprovacao: {
     type: String,
-    required: true
+    required: true,
+    enum: ['Pendente', 'Aprovado', 'Rejeitado'],
+    default: 'Pendente'
   }
+}, {
+  timestamps: true
 });
+
+DespesaSchema.plugin(AutoIncrement, {inc_field: 'despesaId'});
 
 const DespesaModel = mongoose.model('Despesa', DespesaSchema);
 
