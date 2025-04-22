@@ -4,6 +4,7 @@ import isAuthenticated from "../middlewares/isAuth";
 import ProjetoController from "../controllers/ProjetoController";
 import DepartamentoController from "../controllers/DepartamentoController";
 import CategoriaController from "../controllers/CategoriaController";
+import PacoteController from "../controllers/PacoteController";
 
 const express = require('express')
 const router = express.Router()
@@ -12,6 +13,10 @@ const despesaController = new DespesaController()
 const projetoController = new ProjetoController();
 const departamentoController = new DepartamentoController();
 const categoriaController = new CategoriaController();
+const pacoteController = new PacoteController();
+
+router.post('/pacote', pacoteController.create);
+router.get("/pacote", pacoteController.getAll);
 
 router.post("/despesa", despesaController.create);
 router.get("/despesa", despesaController.getAll);
