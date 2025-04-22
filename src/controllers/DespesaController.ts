@@ -32,6 +32,11 @@ export default class DespesaController {
                 userId,
             });
 
+            await PacoteModel.updateOne(
+                { pacoteId: pacoteId },
+                { $push: { despesas: despesa.despesaId } }
+            );
+            
             res.status(201).json(despesa);
         } catch (error) {
             console.error("Erro ao criar despesa:", error);
