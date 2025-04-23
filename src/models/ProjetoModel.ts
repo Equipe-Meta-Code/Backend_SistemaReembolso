@@ -18,7 +18,11 @@ const ProjetoSchema = new mongoose.Schema({
     nome: { type: String, required: true }
   }],
 
-  funcionarios: [{ type: Number, required: true }]
+  funcionarios: [{
+    userId: { type: Number, required: true },
+    name: { type: String, required: true }
+  }]
+  
 }, { timestamps: true });
 
 ProjetoSchema.plugin(AutoIncrement, { inc_field: "projetoId" });
