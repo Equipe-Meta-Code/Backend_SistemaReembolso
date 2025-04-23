@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import DespesaModel from '../models/DespesaModel';
 import PacoteModel from '../models/PacoteModel';
+import CategoriaModel from '../models/CategoriaModel';
   
 export default class DespesaController {
 
@@ -78,4 +79,51 @@ export default class DespesaController {
             res.status(500).json({ error: 'Erro ao atualizar aprovação da despesa' });
         }
     }
+
+    //Busca despesas por uma lista de IDs e retorna com os nomes das categorias
+    async getByIds(req: Request, res: Response) {
+            try {
+            const { ids } = req.body;
+        
+            if (!ids || !Array.isArray(ids)) {
+                return res.status(400).json({ error: 'O corpo da requisição deve conter um array de IDs' });
+            }
+        
+            // Busca despesas
+            const despesas = await DespesaModel.find({ despesaId: { $in: ids } });
+        
+
+            const categoriaIds = Array.from(
+                new Set(
+                despesas
+                    .map(d => d.categoria) //Extrai "categoria" de cada despesa
+                    .filter((c): c is string => typeof c === 'string') 
+                )
+            );
+            const categorias = await CategoriaModel.find({ 
+                categoriaId: { $in: categoriaIds.map(id => parseInt(id)) } 
+            }); //Busca no banco todas as categorias que estão com o id na lista
+      
+            const categoriaMap = categorias.reduce((acc, cat) => {
+                if (cat.categoriaId != null) {
+                    acc[cat.categoriaId] = cat.nome;
+                }
+                return acc;
+            }, {} as Record<number, string>);
+        
+            const despesasComNomeCategoria = despesas.map(d => {
+                const catId = parseInt(d.categoria); 
+                return {
+                    ...d.toObject(),
+                    categoria: categoriaMap[catId] || d.categoria,
+                };
+            });
+        
+            res.status(200).json(despesasComNomeCategoria);
+            } catch (error) {
+                console.error('Erro ao buscar despesas por IDs:', error);
+                res.status(500).json({ error: 'Erro ao buscar despesas por IDs' });
+            }
+        }
+            
 }

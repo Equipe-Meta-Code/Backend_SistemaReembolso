@@ -21,6 +21,7 @@ router.get("/pacote", pacoteController.getAll);
 router.post("/despesa", despesaController.create);
 router.get("/despesa", despesaController.getAll);
 router.put("/despesa/:id", despesaController.aprovarDespesas);
+router.post('/despesas/by-ids', despesaController.getByIds);
 
 
 router.post("/projeto", projetoController.create);
