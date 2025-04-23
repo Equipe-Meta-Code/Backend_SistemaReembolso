@@ -32,6 +32,8 @@ router.get("/projeto", projetoController.getAll);
 // Rotas de departamentos
 router.post("/departamentos", departamentoController.create);
 router.get("/departamentos", departamentoController.getAll);
+router.put('/departamentos/:id', departamentoController.update);
+router.delete('/departamentos/:id', departamentoController.delete);
 
 // Rotas de Categorias
 router.post("/categorias", categoriaController.create);
