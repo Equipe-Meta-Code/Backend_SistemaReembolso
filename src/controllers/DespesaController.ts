@@ -7,8 +7,13 @@ export default class DespesaController {
 
     //criar despesa
     async create(req: Request, res: Response) {
+        if (req.body.data == null || req.body.data === "") {
+            return res.status(400).json({
+                error: 'Campo data é obrigatório',
+                alertType: 'error', // Alerta de erro
+            });
+        }
 
-        if (req.body.data == null || req.body.data === "") return res.status(400).json({error: 'campo data é obrigatório'})
         try {
             const { pacoteId, projetoId, categoria, data, valor_gasto, descricao, aprovacao, userId } = req.body;
 
@@ -19,7 +24,10 @@ export default class DespesaController {
             });
 
             if (!pacoteOk) {
-                return res.status(400).json({ erro: 'Pacote inválido ou já enviado'});
+                return res.status(400).json({
+                    erro: 'Pacote inválido ou já enviado',
+                    alertType: 'error', // Alerta de erro
+                });
             }
 
             //criar a despesa
@@ -39,28 +47,40 @@ export default class DespesaController {
             );
             
             res.status(201).json(despesa);
+            
         } catch (error) {
             console.error("Erro ao criar despesa:", error);
-            res.status(500).json({ error: 'Erro ao criar despesa', detalhe: error });
-
+            res.status(500).json({
+                error: 'Erro ao criar despesa',
+                detalhe: error,
+                alertType: 'error', // Alerta de erro
+            });
         }
     }
 
+    // Buscar todas as despesas
     async getAll(req: Request, res: Response) {
         try {
             const despesas = await DespesaModel.find();
             res.status(200).json(despesas);
         } catch (error) {
-            res.status(500).json({ error: 'Erro ao buscar despesas' });
+            res.status(500).json({
+                error: 'Erro ao buscar despesas',
+                alertType: 'error', // Alerta de erro
+            });
         }
     }
 
+    // Aprovar despesas
     async aprovarDespesas(req: Request, res: Response) {
         const { id } = req.params;
         const { aprovacao } = req.body;
         
         if (!aprovacao) {
-            return res.status(400).json({ error: 'Campo aprovação é obrigatório' });
+            return res.status(400).json({
+                error: 'Campo aprovação é obrigatório',
+                alertType: 'error', // Alerta de erro
+            });
         }
         
         try {
@@ -71,12 +91,18 @@ export default class DespesaController {
             );
             
             if (!despesaAtualizada) {
-                return res.status(404).json({ error: 'Despesa não encontrada' });
+                return res.status(404).json({
+                    error: 'Despesa não encontrada',
+                    alertType: 'error', // Alerta de erro
+                });
             }
             
             res.status(200).json(despesaAtualizada);
         } catch (error) {
-            res.status(500).json({ error: 'Erro ao atualizar aprovação da despesa' });
+            res.status(500).json({
+                error: 'Erro ao atualizar aprovação da despesa',
+                alertType: 'error', // Alerta de erro
+            });
         }
     }
 

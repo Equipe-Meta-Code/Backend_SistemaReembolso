@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import User from "../models/UserModel"; // Alterado de UserModel para User
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
@@ -15,13 +15,21 @@ class UserController {
 
         // Validations
         if (!name || !email || !password) {
-            throw new Error("Por favor, preencha todos os campos.");
+            res.status(400).json({ 
+                message: "Por favor, preencha todos os campos.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
 
         // Check if user exists
         const userExists = await User.findOne({ email });
         if (userExists) {
-            throw new Error("Usuário já cadastrado.");
+            res.status(400).json({ 
+                message: "Usuário já cadastrado.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
 
         // Hash the user password
@@ -46,13 +54,21 @@ class UserController {
         // Check if user email exists
         const user = await User.findOne({ email });
         if (!user) {
-            throw new Error("Credenciais inválidas.");
+            res.status(401).json({ 
+                message: "Credenciais inválidas.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
 
         // Check if user password is valid
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            throw new Error("Credenciais inválidas.");
+            res.status(401).json({ 
+                message: "Credenciais inválidas.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
 
         // Generate the token
@@ -61,6 +77,7 @@ class UserController {
         // Send the response
         res.json({
             message: "Login sucesso",
+            alertType: "success",
             token,
             id: user.userId,
             name: user.name,
@@ -73,7 +90,11 @@ class UserController {
         // Find the user
         const user = await User.findById({ userId: req.user }).select("-password");
         if (!user) {
-            throw new Error("Usuário não encontrado.");
+            res.status(404).json({ 
+                message: "Usuário não encontrado.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
         res.json({ user });
     });
@@ -82,11 +103,14 @@ class UserController {
         const users = await User.find({}).select("-password");
         
         if (!users || users.length === 0) {
-            throw new Error("Nenhum usuário encontrado.");
+            res.status(404).json({ 
+                message: "Nenhum usuário encontrado.",
+                alertType: "error"
+            });
+            return; // Garantir que a função retorne void após o envio de resposta
         }
         res.json({ users });
     });
-    
 }
 
 export default UserController;
