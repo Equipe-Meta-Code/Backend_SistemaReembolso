@@ -91,4 +91,20 @@ export default class ProjetoController {
       res.status(500).json({ error: "Erro ao buscar projetos." });
     }
   }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const { projetoId } = req.params;
+  
+      const projeto = await ProjetoModel.findOne({ projetoId: projetoId });
+      if (!projeto) {
+        return res.status(404).json({ error: "Projeto não encontrado." });
+      }
+  
+      res.status(200).json(projeto);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar projeto." });
+    }
+  }
+  
 }
