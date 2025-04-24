@@ -16,6 +16,7 @@ const categoriaController = new CategoriaController();
 const pacoteController = new PacoteController();
 
 router.post('/pacote', pacoteController.create);
+router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get("/pacote", pacoteController.getAll);
 
 router.post("/despesa", despesaController.create);

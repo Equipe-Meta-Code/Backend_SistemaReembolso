@@ -28,6 +28,43 @@ export default class PacoteController {
         }
     };
 
+    //enviar pacote para aprovação
+    async enviarPacote(req: Request, res: Response) {
+        try {
+            const pacoteId = Number(req.params.pacoteId);
+
+            const pacote = await PacoteModel.findOne({
+                pacoteId: pacoteId,
+                //userId: userId, // garante que o pacote é do usuário logado
+            });
+            console.log(pacote);
+
+            if (!pacote || pacote.status !== 'rascunho') {
+                return res.status(400).json({ erro: 'Pacote inválido ou já enviado'});
+            }
+        
+            const despesas = await DespesaModel.find({
+                despesaId: { $in: pacote.despesas },
+            });              
+
+            if (despesas.length === 0) {
+                return res.status(400).json({ erro: 'Pacote sem despesas' });
+            }
+
+            pacote.status = 'aguardando_aprovacao';
+            await pacote.save();
+
+            /*await DespesaModel.updateMany(
+                { pacoteId: pacote.pacoteId },
+                { aprovacao: 'Pendente' }
+            );*/
+
+            res.json({ mensagem: 'Pacote enviado com sucesso', pacote });
+        } catch (error) {
+            res.status(500).json({ erro: 'Erro ao enviar pacote', detalhe: error });
+        }
+    }
+
     async getAll(req: Request, res: Response) {
             try {
                 const pacotes = await PacoteModel.find();
