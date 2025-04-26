@@ -19,6 +19,7 @@ const pacoteController = new PacoteController();
 router.post('/pacote', pacoteController.create);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get("/pacote", pacoteController.getAll);
+router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
 
 // Rotas de Despesas
 router.post("/despesa", despesaController.create);

@@ -74,4 +74,30 @@ export default class PacoteController {
                 res.status(500).json({ error: 'Erro ao buscar pacotes' });
             }
     }
+
+    // buscar 1 pacote com despesas detalhadas
+    async getPacoteComDespesas(req: Request, res: Response) {
+        try {
+            const pacoteId = Number(req.params.pacoteId);
+
+            const pacote = await PacoteModel.findOne({ pacoteId });
+
+            if (!pacote) {
+                return res.status(404).json({ erro: 'Pacote não encontrado' });
+            }
+
+            const despesas = await DespesaModel.find({
+                despesaId: { $in: pacote.despesas }
+            }).select('despesaId aprovacao');
+
+            const pacoteComDespesas = {
+                ...pacote.toObject(),
+                despesasDetalhadas: despesas
+            };
+
+            res.status(200).json(pacoteComDespesas);
+        } catch (error) {
+            res.status(500).json({ erro: 'Erro ao buscar pacote com despesas', detalhe: error });
+        }
+    }
 }
