@@ -34,7 +34,7 @@ const DespesaSchema = new mongoose.Schema({
   aprovacao: {
     type: String,
     required: true,
-    enum: ['Pendente', 'Aprovado', 'Rejeitado'],
+    enum: ['Pendente', 'Aprovado', 'Recusado'],
     default: 'Pendente'
   }
 }, {

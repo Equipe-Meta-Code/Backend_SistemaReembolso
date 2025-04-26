@@ -24,8 +24,8 @@ const PacoteSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['rascunho', 'aguardando_aprovacao', 'aprovado', 'rejeitado'],
-    default: 'rascunho',
+    enum: ['Rascunho', 'Aguardando Aprovação', 'Aprovado', 'Recusado', 'Aprovado Parcialmente'],
+    default: 'Rascunho',
   },
 
   despesas: [{ 

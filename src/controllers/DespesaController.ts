@@ -15,7 +15,7 @@ export default class DespesaController {
             //verifica se pacote pertence ao usuário e está em rascunho
             const pacoteOk = await PacoteModel.findOne({
                 userId,
-                status: 'rascunho'
+                status: 'Rascunho'
             });
 
             if (!pacoteOk) {

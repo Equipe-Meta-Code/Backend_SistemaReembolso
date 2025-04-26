@@ -39,7 +39,7 @@ export default class PacoteController {
             });
             console.log(pacote);
 
-            if (!pacote || pacote.status !== 'rascunho') {
+            if (!pacote || pacote.status !== 'Rascunho') {
                 return res.status(400).json({ erro: 'Pacote inválido ou já enviado'});
             }
         
@@ -51,7 +51,7 @@ export default class PacoteController {
                 return res.status(400).json({ erro: 'Pacote sem despesas' });
             }
 
-            pacote.status = 'aguardando_aprovacao';
+            pacote.status = 'Aguardando Aprovação';
             await pacote.save();
 
             /*await DespesaModel.updateMany(
@@ -65,6 +65,7 @@ export default class PacoteController {
         }
     }
 
+    // buscar todos os pacotes
     async getAll(req: Request, res: Response) {
             try {
                 const pacotes = await PacoteModel.find();
