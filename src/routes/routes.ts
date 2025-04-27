@@ -27,6 +27,8 @@ interface ImageRow extends RowDataPacket {
 }
 
 router.post('/imagem', upload.single('profileImage'), ImageController.salvarImagem);
+router.get('/imagens/:id', ImageController.buscarPorId);
+router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
