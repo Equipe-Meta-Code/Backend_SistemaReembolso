@@ -100,4 +100,32 @@ export default class PacoteController {
             res.status(500).json({ erro: 'Erro ao buscar pacote com despesas', detalhe: error });
         }
     }
+
+    async updateStatus(req: Request, res: Response) {
+        try {
+          const { id } = req.params;
+          const { status } = req.body;
+      
+          if (!['Aprovado', 'Recusado'].includes(status)) {
+            return res.status(400).json({ erro: 'Status inválido' });
+          }
+      
+          const pacote = await PacoteModel.findOneAndUpdate(
+            { pacoteId: Number(id) },
+            { status },
+            { new: true }
+          );
+      
+          if (!pacote) {
+            return res.status(404).json({ erro: 'Pacote não encontrado' });
+          }
+      
+          res.status(200).json(pacote);
+        } catch (error) {
+          res
+            .status(500)
+            .json({ erro: 'Erro ao atualizar status do pacote', detalhe: error });
+        }
+    }
+
 }
