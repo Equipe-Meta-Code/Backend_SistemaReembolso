@@ -1,3 +1,4 @@
+import multer from 'multer';
 import DespesaController from "../controllers/DespesaController";
 import UserController from "../controllers/UserController"; 
 import isAuthenticated from "../middlewares/isAuth"; 
@@ -5,16 +6,27 @@ import ProjetoController from "../controllers/ProjetoController";
 import DepartamentoController from "../controllers/DepartamentoController";
 import CategoriaController from "../controllers/CategoriaController";
 import PacoteController from "../controllers/PacoteController";
-
+import ImageController from "../controllers/ImageController";
+import pool from '../config/database'; // Importe o pool se ainda não estiver importado
+import { RowDataPacket } from 'mysql2';
 const express = require('express');
+import { Request, Response } from 'express';
+
 const router = express.Router();
 
+const upload = multer({ storage: multer.memoryStorage() });
 const despesaController = new DespesaController();
 const projetoController = new ProjetoController();
 const departamentoController = new DepartamentoController();
 const categoriaController = new CategoriaController();
 const pacoteController = new PacoteController();
 
+
+interface ImageRow extends RowDataPacket {
+    foto: Buffer;
+}
+
+router.post('/imagem', upload.single('profileImage'), ImageController.salvarImagem);
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
