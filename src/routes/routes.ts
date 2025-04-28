@@ -35,6 +35,8 @@ router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.get("/pacote", pacoteController.getAll);
+router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
+router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
 router.put('/pacote/:id/status', pacoteController.updateStatus);
 
 // Rotas de Despesas
@@ -46,6 +48,7 @@ router.post('/despesas/by-ids', despesaController.getByIds);
 // Rotas de Projetos
 router.post("/projeto", projetoController.create);
 router.get("/projeto", projetoController.getAll);
+router.get('/projeto/:projetoId', projetoController.getById);
 
 // Rotas de departamentos
 router.post("/departamentos", departamentoController.create);
