@@ -77,6 +77,16 @@ class UserController {
         }
         res.json({ user });
     });
+
+    static userList = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const users = await User.find({}).select("-password");
+        
+        if (!users || users.length === 0) {
+            throw new Error("Nenhum usuário encontrado.");
+        }
+        res.json({ users });
+    });
+    
 }
 
 export default UserController;
