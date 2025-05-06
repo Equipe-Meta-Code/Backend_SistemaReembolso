@@ -14,6 +14,7 @@ export default class PacoteController {
                 return res.status(400).json({ erro: 'Já existe um pacote com esse nome nesse projeto' });
             }*/
 
+            // Criar novo pacote
             const pacote = await PacoteModel.create({
                 nome,
                 projetoId,
@@ -24,7 +25,12 @@ export default class PacoteController {
 
             res.status(201).json(pacote);
         } catch (error) {
-            res.status(500).json({ erro: 'Erro ao criar pacote', detalhe: error });
+            console.error("Erro ao criar pacote:", error);
+            res.status(500).json({
+                error: 'Erro ao criar pacote',
+                detalhe: error,
+                alertType: 'error', // Alerta de erro
+            });
         }
     };
 
