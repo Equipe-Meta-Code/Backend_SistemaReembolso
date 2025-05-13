@@ -26,7 +26,7 @@ class UserController {
         const userExists = await User.findOne({ email });
         if (userExists) {
             res.status(400).json({ 
-                message: "Usuário já cadastrado.",
+                message: "Email já está em uso!",
                 alertType: "error"
             });
             return; // Garantir que a função retorne void após o envio de resposta
