@@ -14,7 +14,21 @@ import { Request, Response } from 'express';
 
 const router = express.Router();
 
-const upload = multer({ storage: multer.memoryStorage() });
+// configura multer em memória, com fileFilter para imagens e PDF
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // até 10MB
+  fileFilter: (_req, file, cb) => {
+    if (
+      file.mimetype.startsWith('image/') ||
+      file.mimetype === 'application/pdf'
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error('Somente imagens (jpeg/png) e PDF são permitidos'));
+    }
+  }
+});
 
 const despesaController = new DespesaController();
 const projetoController = new ProjetoController();
@@ -27,7 +41,9 @@ interface ImageRow extends RowDataPacket {
     foto: Buffer;
 }
 
-// Rotas de upload de imagem
+router.post('/upload', upload.single('file'), ImageController.salvarImagem);
+
+// Rotas de upload de imagem de perfil (campo 'profileImage')
 router.post('/imagem', upload.single('profileImage'), ImageController.salvarImagem);
 router.get('/imagens/:id', ImageController.buscarPorId);
 router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
