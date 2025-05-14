@@ -9,6 +9,7 @@ interface MulterRequest extends Request {
 
 interface ImageRow extends RowDataPacket {
   foto: Buffer;
+  mimeType: string;
   updatedAt?: Date;
 }
 
@@ -17,13 +18,19 @@ export default class ImageController {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Sem arquivo.' });
     }
+
     const { tipo, tipoId } = req.body;
     if (!tipo || !tipoId) {
       return res.status(400).json({ success: false, message: 'Dados incompletos.' });
     }
 
     try {
-      await ImageModel.upsert(req.file.buffer, tipo, Number(tipoId));
+      await ImageModel.upsert(
+        req.file.buffer,
+        tipo,
+        Number(tipoId),
+        req.file.mimetype
+      );
       return res.json({
         success: true,
         imagemUrl: `http://localhost:3333/imagens/${encodeURIComponent(tipo)}/${tipoId}`
@@ -65,23 +72,23 @@ export default class ImageController {
     try {
       const { tipo, tipoId } = req.params;
       const [rows] = await pool.query<ImageRow[]>(
-        'SELECT foto, updatedAt FROM images WHERE tipo = ? AND tipoId = ? LIMIT 1',
+        'SELECT foto, mimeType, updatedAt FROM images WHERE tipo = ? AND tipoId = ? LIMIT 1',
         [tipo, Number(tipoId)]
       );
 
       if (rows.length === 0) {
-        return res.status(404).send('Imagem não encontrada');
+        return res.status(404).send('Arquivo não encontrado');
       }
 
-      const { foto, updatedAt } = rows[0];
+      const { foto, mimeType, updatedAt } = rows[0];
       res
         .setHeader('Last-Modified', new Date(updatedAt!).toUTCString())
-        .setHeader('Content-Type', 'image/jpeg');
+        .setHeader('Content-Type', mimeType);
 
       return res.send(foto);
     } catch (err) {
-      console.error('[BACK] Erro ao buscar imagem por tipo/tipoId:', err);
-      return res.status(500).send('Erro ao buscar imagem');
+      console.error('[BACK] Erro ao buscar arquivo:', err);
+      return res.status(500).send('Erro ao buscar arquivo');
     }
   }
 }
