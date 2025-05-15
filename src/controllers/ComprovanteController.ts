@@ -47,6 +47,34 @@ export default class ComprovanteController {
       return res.status(500).json({ success: false, message: 'Erro interno.' });
     }
   }
+
+  static async buscarPorId(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const [rows] = await pool.query<ComprovanteRow[]>(
+        'SELECT foto FROM comprovantes WHERE id = ?',
+        [id]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).send('Imagem não encontrada');
+      }
+
+      res
+        .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .setHeader('Pragma', 'no-cache')
+        .setHeader('Expires', '0')
+        .setHeader('Content-Type', 'image/jpeg');
+
+      return res.send(rows[0].foto);
+
+    } catch (err) {
+      console.error('[BACK] Erro ao buscar imagem por id:', err);
+      return res.status(500).send('Erro ao buscar imagem');
+    }
+  }
+
+
   static async buscarPorTipoId(req: Request, res: Response) {
     try {
       const { tipo, tipoId } = req.params;
