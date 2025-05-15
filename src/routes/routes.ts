@@ -11,6 +11,7 @@ import pool from '../config/database'; // Importe o pool se ainda não estiver i
 import { RowDataPacket } from 'mysql2';
 const express = require('express');
 import { Request, Response } from 'express';
+import ComprovanteController from '../controllers/ComprovanteController';
 
 const router = express.Router();
 
@@ -48,6 +49,7 @@ router.post('/imagem', upload.single('profileImage'), ImageController.salvarImag
 router.get('/imagens/:id', ImageController.buscarPorId);
 router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
 
+router.post('/uploadcomprovante', upload.single('receipt'), ComprovanteController.salvarComprovante);
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.get("/pacote", pacoteController.getAll);
