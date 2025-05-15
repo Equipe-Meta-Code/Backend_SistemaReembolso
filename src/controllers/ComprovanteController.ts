@@ -47,6 +47,30 @@ export default class ComprovanteController {
       return res.status(500).json({ success: false, message: 'Erro interno.' });
     }
   }
+  static async buscarPorTipoId(req: Request, res: Response) {
+    try {
+      const { tipo, tipoId } = req.params;
+      const [rows] = await pool.query<ComprovanteRow[]>(
+        'SELECT foto, mimeType, updatedAt FROM comprovantes WHERE tipo = ? AND tipoId = ? LIMIT 1',
+        [tipo, Number(tipoId)]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).send('Arquivo não encontrado');
+      }
+
+      const { foto, mimeType, updatedAt } = rows[0];
+      res
+        .setHeader('Last-Modified', new Date(updatedAt!).toUTCString())
+        .setHeader('Content-Type', mimeType);
+
+      return res.send(foto);
+      
+    } catch (err) {
+      console.error('[BACK] Erro ao buscar arquivo:', err);
+      return res.status(500).send('Erro ao buscar arquivo');
+    }
+  }
   
 
 }

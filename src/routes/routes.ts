@@ -50,6 +50,7 @@ router.get('/imagens/:id', ImageController.buscarPorId);
 router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
 
 router.post('/uploadcomprovante', upload.single('receipt'), ComprovanteController.salvarComprovante);
+router.get('/comprovantes/:tipo/:tipoId', ImageController.buscarPorTipoId);
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.get("/pacote", pacoteController.getAll);
