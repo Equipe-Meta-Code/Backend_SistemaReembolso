@@ -30,7 +30,7 @@ export default class ComprovanteController {
     }
 
     try {
-      await ComprovanteModel.upsert(
+      await ComprovanteModel.create(
         req.file.buffer,
         tipo,
         Number(tipoId),
@@ -48,31 +48,31 @@ export default class ComprovanteController {
     }
   }
 
+  // controllers/ComprovanteController.ts
   static async buscarPorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const [rows] = await pool.query<ComprovanteRow[]>(
-        'SELECT foto FROM comprovantes WHERE id = ?',
+        'SELECT foto, mimeType, updatedAt FROM comprovantes WHERE id = ?',
         [id]
       );
 
       if (rows.length === 0) {
-        return res.status(404).send('Imagem não encontrada');
+        return res.status(404).send('Arquivo não encontrado');
       }
 
+      const { foto, mimeType, updatedAt } = rows[0];
       res
-        .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-        .setHeader('Pragma', 'no-cache')
-        .setHeader('Expires', '0')
-        .setHeader('Content-Type', 'image/jpeg');
+        .setHeader('Last-Modified', new Date(updatedAt!).toUTCString())
+        .setHeader('Content-Type', mimeType);
 
-      return res.send(rows[0].foto);
-
+      return res.send(foto);
     } catch (err) {
-      console.error('[BACK] Erro ao buscar imagem por id:', err);
-      return res.status(500).send('Erro ao buscar imagem');
+      console.error('[BACK] Erro ao buscar arquivo por id:', err);
+      return res.status(500).send('Erro ao buscar arquivo');
     }
   }
+
 
 
   static async buscarPorTipoId(req: Request, res: Response) {
