@@ -1,10 +1,16 @@
 // utils/sendEmail.ts
+import dotenv from 'dotenv';
+dotenv.config();
+
 import nodemailer from "nodemailer";
+
+console.log("Email de envio:", process.env.EMAIL_USER);
+console.log("Senha do app:", process.env.EMAIL_PASS ? "Definida" : "Não definida");
 
 const transporter = nodemailer.createTransport({
     service: "gmail", // ou "hotmail", ou SMTP personalizado
     auth: {
-        user: process.env.EMAIL_USER, // e.g. your@gmail.com
+        user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
     },
 });

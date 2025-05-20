@@ -3,6 +3,9 @@ import User from "../models/UserModel"; // Alterado de UserModel para User
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendVerificationCode } from "../utils/sendEmail";
+import { saveCode, verifyCode } from "../utils/2faStore";
+import crypto from "crypto";
 
 interface AuthRequest extends Request {
     user?: number;
@@ -52,7 +55,7 @@ class UserController {
         const { email, password } = req.body;
 
         // Check if user email exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.trim() });
         if (!user) {
             res.status(401).json({ 
                 message: "Credenciais inválidas.",
@@ -71,12 +74,58 @@ class UserController {
             return; // Garantir que a função retorne void após o envio de resposta
         }
 
-        // Generate the token
-        const token = jwt.sign({ id: user._id }, "anyKey" /* , { expiresIn: "30d" } */);
+        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+        saveCode(user.email, verificationCode);
 
-        // Send the response
+        console.log("Código gerado:", verificationCode);
+        console.log("Email alvo:", user.email);
+
+        try {
+            await sendVerificationCode(user.email, verificationCode);
+            console.log("Email enviado com sucesso.");
+        } catch (err) {
+            console.error("Erro ao enviar email de verificação:", err);
+            res.status(500).json({
+                message: "Erro ao enviar código de verificação.",
+                alertType: "error"
+            });
+            return;
+        }
+
         res.json({
-            message: "Login sucesso",
+            message: "Código de verificação enviado para seu email.",
+            alertType: "info",
+            email,
+        });
+    });
+
+    // Verificar código 2FA
+    static verify2FA = asyncHandler(async (req: Request, res: Response) => {
+        const { email, code } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404).json({
+                message: "Usuário não encontrado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        const isValid = verifyCode(email, code);
+        if (!isValid) {
+            res.status(401).json({
+                message: "Código inválido ou expirado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        // Gerar token JWT após verificação
+        const token = jwt.sign({ id: user.userId }, "anyKey");
+
+        res.json({
+            message: "Autenticação bem-sucedida!",
             alertType: "success",
             token,
             id: user.userId,
