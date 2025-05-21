@@ -74,23 +74,14 @@ class UserController {
             return; // Garantir que a função retorne void após o envio de resposta
         }
 
+        // Geração do código 2FA
         const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+        
+        // Armazenamento temporário do código
         saveCode(user.email, verificationCode);
 
-        console.log("Código gerado:", verificationCode);
-        console.log("Email alvo:", user.email);
-
-        try {
-            await sendVerificationCode(user.email, verificationCode);
-            console.log("Email enviado com sucesso.");
-        } catch (err) {
-            console.error("Erro ao enviar email de verificação:", err);
-            res.status(500).json({
-                message: "Erro ao enviar código de verificação.",
-                alertType: "error"
-            });
-            return;
-        }
+        // Envio do código por email
+        await sendVerificationCode(user.email, verificationCode);
 
         res.json({
             message: "Código de verificação enviado para seu email.",
@@ -99,10 +90,11 @@ class UserController {
         });
     });
 
-    // Verificar código 2FA
+    // Verificação do código 2FA
     static verify2FA = asyncHandler(async (req: Request, res: Response) => {
         const { email, code } = req.body;
 
+        // Verifica se o usuário existe
         const user = await User.findOne({ email });
         if (!user) {
             res.status(404).json({
@@ -112,6 +104,7 @@ class UserController {
             return;
         }
 
+        // Verifica se o código é válido
         const isValid = verifyCode(email, code);
         if (!isValid) {
             res.status(401).json({
