@@ -127,6 +127,40 @@ class UserController {
         });
     });
 
+    // Reenviar código de verificação 2FA
+    static resendCode = asyncHandler(async (req: Request, res: Response) => {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400).json({
+                message: "Email é obrigatório.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404).json({
+                message: "Usuário não encontrado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+
+        saveCode(email, verificationCode); // salva novo código
+
+        await sendVerificationCode(email, verificationCode); // reenvia
+
+        res.json({
+            message: "Novo código de verificação enviado.",
+            alertType: "info",
+            email,
+        });
+    });
+
     // Profile
     static profile = asyncHandler(async (req: AuthRequest, res: Response) => {
         // Find the user

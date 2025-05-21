@@ -66,6 +66,7 @@ router.delete('/categorias/:id', categoriaController.delete);
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.post("/verify-2fa", UserController.verify2FA);
+router.post("/resend-code", UserController.resendCode);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
 
