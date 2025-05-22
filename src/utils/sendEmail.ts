@@ -10,7 +10,7 @@ console.log("Senha do app:", process.env.EMAIL_PASS ? "Definida" : "Não definid
 const transporter = nodemailer.createTransport({
     service: "gmail", // ou "hotmail", ou SMTP personalizado
     auth: {
-        user: process.env.EMAIL_USER, 
+        user: process.env.EMAIL_USER, // adicione em .env.example
         pass: process.env.EMAIL_PASS,
     },
 });
