@@ -74,20 +74,34 @@ class UserController {
             return; // Garantir que a função retorne void após o envio de resposta
         }
 
-        // Geração do código 2FA
-        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
-        
-        // Armazenamento temporário do código
-        saveCode(user.email, verificationCode);
+        // Se o 2FA estiver ativado, envie o código e pare aqui
+        if (user.twoFactorEnabled) {
+            const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+            saveCode(user.email, verificationCode);
+            await sendVerificationCode(user.email, verificationCode);
 
-        // Envio do código por email
-        await sendVerificationCode(user.email, verificationCode);
+            res.json({
+                message: "Código de verificação enviado para seu email.",
+                alertType: "info",
+                email,
+                requires2FA: true
+            });
+            return;
+        }
+
+        // Se não tiver 2FA, retorna token direto
+        const token = jwt.sign({ id: user.userId }, "anyKey");
 
         res.json({
-            message: "Código de verificação enviado para seu email.",
-            alertType: "info",
-            email,
+            message: "Autenticação bem-sucedida!",
+            alertType: "success",
+            token,
+            id: user.userId,
+            name: user.name,
+            email: user.email,
+            requires2FA: false
         });
+
     });
 
     // Verificação do código 2FA
