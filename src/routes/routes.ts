@@ -7,6 +7,7 @@ import DepartamentoController from "../controllers/DepartamentoController";
 import CategoriaController from "../controllers/CategoriaController";
 import PacoteController from "../controllers/PacoteController";
 import ImageController from "../controllers/ImageController";
+import NotificacaoController from '../controllers/NotificacaoController';
 import pool from '../config/database'; // Importe o pool se ainda não estiver importado
 import { RowDataPacket } from 'mysql2';
 const express = require('express');
@@ -36,6 +37,7 @@ const projetoController = new ProjetoController();
 const departamentoController = new DepartamentoController();
 const categoriaController = new CategoriaController();
 const pacoteController = new PacoteController();
+const notificacaoController = new NotificacaoController();
 
 
 interface ImageRow extends RowDataPacket {
@@ -90,5 +92,10 @@ router.post("/verify-2fa", UserController.verify2FA);
 router.post("/resend-code", UserController.resendCode);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
+
+// Rotas de Notificações
+router.post('/notifications', notificacaoController.create);
+router.get('/notifications', notificacaoController.getAll);
+router.patch('/notifications/:id', notificacaoController.update);
 
 export { router };
