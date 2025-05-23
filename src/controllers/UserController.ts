@@ -3,6 +3,9 @@ import User from "../models/UserModel"; // Alterado de UserModel para User
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendVerificationCode } from "../utils/sendEmail";
+import { saveCode, verifyCode } from "../utils/2faStore";
+import crypto from "crypto";
 
 interface AuthRequest extends Request {
     user?: number;
@@ -52,7 +55,7 @@ class UserController {
         const { email, password } = req.body;
 
         // Check if user email exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.trim() });
         if (!user) {
             res.status(401).json({ 
                 message: "Credenciais inválidas.",
@@ -71,17 +74,90 @@ class UserController {
             return; // Garantir que a função retorne void após o envio de resposta
         }
 
-        // Generate the token
-        const token = jwt.sign({ id: user._id }, "anyKey" /* , { expiresIn: "30d" } */);
+        // Geração do código 2FA
+        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+        
+        // Armazenamento temporário do código
+        saveCode(user.email, verificationCode);
 
-        // Send the response
+        // Envio do código por email
+        await sendVerificationCode(user.email, verificationCode);
+
         res.json({
-            message: "Login sucesso",
+            message: "Código de verificação enviado para seu email.",
+            alertType: "info",
+            email,
+        });
+    });
+
+    // Verificação do código 2FA
+    static verify2FA = asyncHandler(async (req: Request, res: Response) => {
+        const { email, code } = req.body;
+
+        // Verifica se o usuário existe
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404).json({
+                message: "Usuário não encontrado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        // Verifica se o código é válido
+        const isValid = verifyCode(email, code);
+        if (!isValid) {
+            res.status(401).json({
+                message: "Código inválido ou expirado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        // Gerar token JWT após verificação
+        const token = jwt.sign({ id: user.userId }, "anyKey");
+
+        res.json({
+            message: "Autenticação bem-sucedida!",
             alertType: "success",
             token,
             id: user.userId,
             name: user.name,
             email: user.email,
+        });
+    });
+
+    // Reenviar código de verificação 2FA
+    static resendCode = asyncHandler(async (req: Request, res: Response) => {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400).json({
+                message: "Email é obrigatório.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404).json({
+                message: "Usuário não encontrado.",
+                alertType: "error"
+            });
+            return;
+        }
+
+        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+
+        saveCode(email, verificationCode); // salva novo código
+
+        await sendVerificationCode(email, verificationCode); // reenvia
+
+        res.json({
+            message: "Novo código de verificação enviado.",
+            alertType: "info",
+            email,
         });
     });
 
