@@ -3,11 +3,11 @@ import User from "../models/UserModel"; // Alterado de UserModel para User
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { sendVerificationCode } from "../Utils/sendEmail";
-import { saveCode } from "../Utils/2faStore";
-import { verifyCode } from "../Utils/2faStore";
-import { authorizeReset } from "../Utils/2faStore";
-import { isAuthorizedForReset } from "../Utils/2faStore";
+import { sendVerificationCode } from "../utils/sendEmail";
+import { saveCode } from "../utils/2faStore";
+import { verifyCode } from "../utils/2faStore";
+import { authorizeReset } from "../utils/2faStore";
+import { isAuthorizedForReset } from "../utils/2faStore";
 import { sendVerificationCode } from "../utils/sendEmail";
 import { saveCode, verifyCode } from "../utils/2faStore";
 import crypto from "crypto";
