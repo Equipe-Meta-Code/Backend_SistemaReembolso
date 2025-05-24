@@ -67,5 +67,10 @@ router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
+router.post("/recuperar-senha", UserController.recuperarSenha);
+router.post("/verificar-codigo", UserController.verificarCodigo);
+router.post('/atualizar-senha', UserController.atualizarSenha);
+
+
 
 export { router };
