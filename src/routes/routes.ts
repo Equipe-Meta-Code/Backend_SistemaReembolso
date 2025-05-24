@@ -92,6 +92,11 @@ router.post("/verify-2fa", UserController.verify2FA);
 router.post("/resend-code", UserController.resendCode);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
+router.post("/recuperar-senha", UserController.recuperarSenha);
+router.post("/verificar-codigo", UserController.verificarCodigo);
+router.post('/atualizar-senha', UserController.atualizarSenha);
+
+
 
 // Rotas de Notificações
 router.post('/notifications', notificacaoController.create);
