@@ -4,9 +4,8 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { authorizeReset } from "../utils/2faStore";
-import { isAuthorizedForReset } from "../utils/2faStore";
 import { sendVerificationCode } from "../utils/sendEmail";
-import { saveCode, verifyCode } from "../utils/2faStore";
+import { saveCode, verifyCode, isAuthorizedForReset } from "../utils/2faStore";
 import crypto from "crypto";
 
 interface AuthRequest extends Request {
