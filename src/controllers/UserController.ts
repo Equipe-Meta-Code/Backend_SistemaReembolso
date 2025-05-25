@@ -76,7 +76,7 @@ class UserController {
         }
 
         // Se o 2FA estiver ativado, envie o código e pare aqui
-        if (user.twoFactorEnabled) {
+        if (user.twoFactorEnabled===true) {
             const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
             saveCode(user.email, verificationCode);
             await sendVerificationCode(user.email, verificationCode);
@@ -90,7 +90,7 @@ class UserController {
             });
             return;
         }
-
+        
         // Se não tiver 2FA, retorna token direto
         const token = jwt.sign({ id: user.userId }, "anyKey");
 
