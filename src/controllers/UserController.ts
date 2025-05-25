@@ -3,11 +3,8 @@ import User from "../models/UserModel"; // Alterado de UserModel para User
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { sendVerificationCode } from "../Utils/sendEmail";
-import { saveCode } from "../Utils/2faStore";
-import { verifyCode } from "../Utils/2faStore";
-import { authorizeReset } from "../Utils/2faStore";
-import { isAuthorizedForReset } from "../Utils/2faStore";
+import { authorizeReset } from "../utils/2faStore";
+import { isAuthorizedForReset } from "../utils/2faStore";
 import { sendVerificationCode } from "../utils/sendEmail";
 import { saveCode, verifyCode } from "../utils/2faStore";
 import crypto from "crypto";
@@ -248,6 +245,61 @@ class UserController {
         });
     });
 
+
+    // Login Web (envia código 2FA)
+    static loginWeb = asyncHandler(async (req: Request, res: Response) => {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user){
+            res.status(401).json({ message: "Credenciais inválidas." });
+            return
+        } 
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            res.status(401).json({ message: "Credenciais inválidas." });
+            return
+        }
+
+        if (user.role !== 'gerente' && user.role !== 'admin') {
+            res.status(403).json({ message: "Acesso permitido apenas para gerentes." });
+            return
+        }
+
+        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+        saveCode(email, verificationCode);
+        await sendVerificationCode(email, verificationCode);
+
+        res.json({ message: "Código enviado para seu email." });
+    });
+
+    // Verificação 2FA Web
+    static verifyWeb = asyncHandler(async (req: Request, res: Response) => {
+        const { email, code } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado." });
+            return
+        }
+
+        const isValid = verifyCode(email, code);
+        if (!isValid) {
+            res.status(401).json({ message: "Código inválido." });
+            return
+        }
+
+        const token = jwt.sign({ id: user.userId, role: user.role }, "anyKey");
+
+        res.json({
+            message: "Autenticação web realizada com sucesso.",
+            token,
+            id: user.userId,
+            name: user.name,
+            role: user.role,
+        });
+    });
 
     // Reenviar código de verificação 2FA
     static resendCode = asyncHandler(async (req: Request, res: Response) => {
