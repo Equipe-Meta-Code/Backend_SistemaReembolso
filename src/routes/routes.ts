@@ -60,7 +60,8 @@ router.post('/pacote', pacoteController.create);
 router.get("/pacote", pacoteController.getAll);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
-router.put('/pacote/:id/status', pacoteController.updateStatus);
+router.put('/pacote/:pacoteId/status', pacoteController.updateStatus);
+
 
 // Rotas de Despesas
 router.post("/despesa", despesaController.create);
@@ -89,16 +90,9 @@ router.delete('/categorias/:id', categoriaController.delete);
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.post("/verify-2fa", UserController.verify2FA);
-router.post("/loginWeb", UserController.loginWeb);
-router.post("/verifyWeb", UserController.verifyWeb);
 router.post("/resend-code", UserController.resendCode);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
-router.post("/recuperar-senha", UserController.recuperarSenha);
-router.post("/verificar-codigo", UserController.verificarCodigo);
-router.put('/atualizar-senha', UserController.atualizarSenha);
-
-
 
 // Rotas de Notificações
 router.post('/notifications', notificacaoController.create);
