@@ -108,30 +108,33 @@ export default class PacoteController {
     }
 
     async updateStatus(req: Request, res: Response) {
-        try {
-          const { id } = req.params;
-          const { status } = req.body;
-      
-          if (!['Aprovado', 'Recusado'].includes(status)) {
-            return res.status(400).json({ erro: 'Status inválido' });
-          }
-      
-          const pacote = await PacoteModel.findOneAndUpdate(
-            { pacoteId: Number(id) },
-            { status },
-            { new: true }
-          );
-      
-          if (!pacote) {
-            return res.status(404).json({ erro: 'Pacote não encontrado' });
-          }
-      
-          res.status(200).json(pacote);
-        } catch (error) {
-          res
-            .status(500)
-            .json({ erro: 'Erro ao atualizar status do pacote', detalhe: error });
-        }
-    }
+    try {
+      const pacoteId = Number(req.params.pacoteId);
+      const { status } = req.body;
+      const validStatuses = [
+        "Aguardando Aprovação",
+        "Aprovado",
+        "Recusado",
+        "Aprovado Parcialmente",
+      ];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ erro: "Status inválido" });
+      }
+      const pacote = await PacoteModel.findOneAndUpdate(
+        { pacoteId },
+        { status },
+        { new: true }
+      );
 
+      if (!pacote) {
+        return res.status(404).json({ erro: "Pacote não encontrado" });
+      }
+      return res.status(200).json(pacote);
+    } catch (error) {
+      console.error("Erro ao atualizar status do pacote:", error);
+      return res
+        .status(500)
+        .json({ erro: "Erro ao atualizar status do pacote", detalhe: error });
+    }
+  }
 }
