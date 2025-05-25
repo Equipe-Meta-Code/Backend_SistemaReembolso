@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
         twoFactorEnabled: {
             type: Boolean,
             default: false,
-        }
+        },
         role: {
             type: String,
             enum: ['usuario', 'gerente', 'admin'],
