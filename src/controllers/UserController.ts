@@ -85,6 +85,7 @@ class UserController {
                 message: "Código de verificação enviado para seu email.",
                 alertType: "info",
                 email,
+                userId: user.userId,
                 twoFactorEnabled: user.twoFactorEnabled
             });
             return;
@@ -100,6 +101,7 @@ class UserController {
             id: user.userId,
             name: user.name,
             email: user.email,
+            userId: user.userId,
             twoFactorEnabled: user.twoFactorEnabled
         });
 
@@ -167,6 +169,7 @@ class UserController {
             id: user.userId,
             name: user.name,
             email: user.email,
+            userId: user.userId,
             twoFactorEnabled: user.twoFactorEnabled,
         });
     });
