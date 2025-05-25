@@ -88,6 +88,7 @@ router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.post("/verify-2fa", UserController.verify2FA);
 router.post("/resend-code", UserController.resendCode);
+router.post("/toggle2FA", isAuthenticated, UserController.toggle2FA);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
 

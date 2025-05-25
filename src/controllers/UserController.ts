@@ -45,10 +45,11 @@ class UserController {
             name,
             email,
             password: hashedPassword,
+            twoFactorEnabled: false,
         });
 
         // Send the response
-        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId });
+        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId, twoFactorEnabled: userCreated.twoFactorEnabled });
     });
 
     // Login
@@ -75,19 +76,63 @@ class UserController {
             return; // Garantir que a função retorne void após o envio de resposta
         }
 
-        // Geração do código 2FA
-        const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
-        
-        // Armazenamento temporário do código
-        saveCode(user.email, verificationCode);
+        // Se o 2FA estiver ativado, envie o código e pare aqui
+        if (user.twoFactorEnabled===true) {
+            const verificationCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+            saveCode(user.email, verificationCode);
+            await sendVerificationCode(user.email, verificationCode);
 
-        // Envio do código por email
-        await sendVerificationCode(user.email, verificationCode);
+            res.json({
+                message: "Código de verificação enviado para seu email.",
+                alertType: "info",
+                email,
+                userId: user.userId,
+                twoFactorEnabled: user.twoFactorEnabled
+            });
+            return;
+        }
+        
+        // Se não tiver 2FA, retorna token direto
+        const token = jwt.sign({ id: user.userId }, "anyKey");
 
         res.json({
-            message: "Código de verificação enviado para seu email.",
-            alertType: "info",
-            email,
+            message: "Autenticação bem-sucedida!",
+            alertType: "success",
+            token,
+            id: user.userId,
+            name: user.name,
+            email: user.email,
+            userId: user.userId,
+            twoFactorEnabled: user.twoFactorEnabled
+        });
+
+    });
+
+    static toggle2FA = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const { enable } = req.body;
+        const userId = req.user; 
+
+        if (!userId) {
+            res.status(401).json({ message: "Usuário não autenticado." });
+            return;
+        }
+
+        console.log("UserID no toggle2FA:", userId);
+
+        const user = await User.findOneAndUpdate(
+            { userId },
+            { twoFactorEnabled: enable },
+            { new: true }
+        );
+
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado." });
+            return;
+        }
+
+        res.json({
+            message: enable ? "2FA ativado." : "2FA desativado.",
+            twoFactorEnabled: user.twoFactorEnabled
         });
     });
 
@@ -125,6 +170,8 @@ class UserController {
             id: user.userId,
             name: user.name,
             email: user.email,
+            userId: user.userId,
+            twoFactorEnabled: user.twoFactorEnabled,
         });
     });
 

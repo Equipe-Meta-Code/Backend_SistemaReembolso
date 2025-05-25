@@ -71,6 +71,11 @@ export default class ImageController {
   static async buscarPorTipoId(req: Request, res: Response) {
     try {
       const { tipo, tipoId } = req.params;
+
+      if (!tipoId || isNaN(Number(tipoId))) {
+        return res.status(400).json({ mensagem: "tipoId inválido" });
+      }
+
       const [rows] = await pool.query<ImageRow[]>(
         'SELECT foto, mimeType, updatedAt FROM images WHERE tipo = ? AND tipoId = ? LIMIT 1',
         [tipo, Number(tipoId)]
