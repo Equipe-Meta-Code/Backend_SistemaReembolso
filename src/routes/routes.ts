@@ -92,6 +92,9 @@ router.post("/toggle2FA", isAuthenticated, UserController.toggle2FA);
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
 
+router.post("/loginWeb", UserController.loginWeb);
+router.post("/verifyWeb", UserController.verifyWeb);
+
 // Rotas de Notificações
 router.post('/notifications', notificacaoController.create);
 router.get('/notifications', notificacaoController.getAll);
