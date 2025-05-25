@@ -44,10 +44,11 @@ class UserController {
             name,
             email,
             password: hashedPassword,
+            twoFactorEnabled: false,
         });
 
         // Send the response
-        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId });
+        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId, twoFactorEnabled: userCreated.twoFactorEnabled });
     });
 
     // Login
@@ -84,7 +85,7 @@ class UserController {
                 message: "Código de verificação enviado para seu email.",
                 alertType: "info",
                 email,
-                requires2FA: true
+                twoFactorEnabled: user.twoFactorEnabled
             });
             return;
         }
@@ -99,9 +100,37 @@ class UserController {
             id: user.userId,
             name: user.name,
             email: user.email,
-            requires2FA: false
+            twoFactorEnabled: user.twoFactorEnabled
         });
 
+    });
+
+    static toggle2FA = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const { enable } = req.body;
+        const userId = req.user; 
+
+        if (!userId) {
+            res.status(401).json({ message: "Usuário não autenticado." });
+            return;
+        }
+
+        console.log("UserID no toggle2FA:", userId);
+
+        const user = await User.findOneAndUpdate(
+            { userId },
+            { twoFactorEnabled: enable },
+            { new: true }
+        );
+
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado." });
+            return;
+        }
+
+        res.json({
+            message: enable ? "2FA ativado." : "2FA desativado.",
+            twoFactorEnabled: user.twoFactorEnabled
+        });
     });
 
     // Verificação do código 2FA
@@ -138,6 +167,7 @@ class UserController {
             id: user.userId,
             name: user.name,
             email: user.email,
+            twoFactorEnabled: user.twoFactorEnabled,
         });
     });
 
