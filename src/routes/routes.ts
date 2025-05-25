@@ -8,7 +8,6 @@ import CategoriaController from "../controllers/CategoriaController";
 import PacoteController from "../controllers/PacoteController";
 import ImageController from "../controllers/ImageController";
 import NotificacaoController from '../controllers/NotificacaoController';
-import pool from '../config/database'; // Importe o pool se ainda não estiver importado
 import { RowDataPacket } from 'mysql2';
 const express = require('express');
 import { Request, Response } from 'express';
@@ -16,7 +15,6 @@ import ComprovanteController from '../controllers/ComprovanteController';
 
 const router = express.Router();
 
-// configura multer em memória, com fileFilter para imagens e PDF
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // até 10MB
@@ -39,18 +37,18 @@ const categoriaController = new CategoriaController();
 const pacoteController = new PacoteController();
 const notificacaoController = new NotificacaoController();
 
-
 interface ImageRow extends RowDataPacket {
     foto: Buffer;
 }
 
 router.post('/upload', upload.single('file'), ImageController.salvarImagem);
 
-// Rotas de upload de imagem de perfil (campo 'profileImage')
+// Rotas de upload de imagem de perfil
 router.post('/imagem', upload.single('profileImage'), ImageController.salvarImagem);
 router.get('/imagens/:id', ImageController.buscarPorId);
 router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
 
+// Rotas de upload de comprovantes
 router.post('/uploadcomprovante', upload.single('receipt'), ComprovanteController.salvarComprovante);
 router.get('/comprovantes/:tipo/:tipoId', ComprovanteController.buscarPorTipoId);
 router.get('/comprovantes/:id(\\d+)', ComprovanteController.buscarPorId);
@@ -61,7 +59,6 @@ router.get("/pacote", pacoteController.getAll);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
 router.put('/pacote/:pacoteId/status', pacoteController.updateStatus);
-
 
 // Rotas de Despesas
 router.post("/despesa", despesaController.create);
