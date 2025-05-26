@@ -70,6 +70,7 @@ router.post('/despesas/by-ids', despesaController.getByIds);
 router.post("/projeto", projetoController.create);
 router.get("/projeto", projetoController.getAll);
 router.get('/projeto/:projetoId', projetoController.getById);
+router.put('/projeto/:id/encerrar', projetoController.encerrar);
 
 // Rotas de departamentos
 router.post("/departamentos", departamentoController.create);

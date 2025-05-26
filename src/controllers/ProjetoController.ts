@@ -71,6 +71,7 @@ export default class ProjetoController {
         categorias: categoriasDetalhadas,
         departamentos: departamentosDetalhados,
         funcionarios,
+        status: 'ativo',
       });
 
       res.status(201).json(projeto);
@@ -104,6 +105,34 @@ export default class ProjetoController {
       res.status(200).json(projeto);
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar projeto." });
+    }
+  }
+
+  async encerrar(req: Request, res: Response) {
+    try {
+      console.log('Encerrar projeto - id:', req.params.id);
+      const { id } = req.params;
+      const projetoIdNum = Number(id);
+      
+      if (isNaN(projetoIdNum)) {
+        return res.status(400).json({ error: 'ID do projeto inválido.' });
+      }
+
+      const projeto = await ProjetoModel.findOneAndUpdate(
+        { projetoId: projetoIdNum },
+        { status: 'encerrado' },
+        { new: true }
+      );
+
+
+      if (!projeto) {
+        return res.status(404).json({ error: 'Projeto não encontrado.' });
+      }
+
+      res.status(200).json({ message: 'Projeto encerrado com sucesso.', projeto });
+    } catch (error) {
+      console.error('Erro ao encerrar projeto:', error);
+      res.status(500).json({ error: 'Erro ao encerrar projeto.' });
     }
   }
   
