@@ -103,8 +103,8 @@ router.post("/loginWeb", UserController.loginWeb);
 router.post("/verifyWeb", UserController.verifyWeb);
 
 // Rotas de Notificações
-router.post('/notifications', notificacaoController.create);
-router.get('/notifications', notificacaoController.getAll);
-router.patch('/notifications/:id', notificacaoController.update);
+router.post('/notificacao', notificacaoController.create);
+router.get('/notificacao', notificacaoController.getAll);
+router.patch('/notificacao/:id', notificacaoController.update);
 
 export { router };
