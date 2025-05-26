@@ -45,11 +45,12 @@ class UserController {
             name,
             email,
             password: hashedPassword,
+            role: "usuario",
             twoFactorEnabled: false,
         });
 
         // Send the response
-        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId, twoFactorEnabled: userCreated.twoFactorEnabled });
+        res.json({ name: userCreated.name, email: userCreated.email, id: userCreated.userId, role: userCreated.role, twoFactorEnabled: userCreated.twoFactorEnabled });
     });
 
     // Login
