@@ -156,4 +156,32 @@ export default class PacoteController {
                 .json({ erro: "Erro interno ao atualizar status do pacote." });
         }
     }
+
+    // excluir pacote 
+    async delete(req: Request, res: Response) {
+        try {
+            const pacoteId = Number(req.params.pacoteId);
+
+            const pacote = await PacoteModel.findOne({ pacoteId });
+
+            if (!pacote) {
+            return res.status(404).json({ erro: 'Pacote não encontrado' });
+            }
+
+            if (pacote.status !== 'Rascunho') {
+            return res.status(400).json({ erro: 'Somente pacotes com status "Rascunho" podem ser excluídos' });
+            }
+
+            if (pacote.despesas && pacote.despesas.length > 0) {
+                return res.status(400).json({ erro: 'Não é possível excluir um pacote que contém despesas.' });
+            }
+
+            await PacoteModel.deleteOne({ pacoteId });
+
+            return res.status(200).json({ mensagem: 'Pacote excluído com sucesso' });
+        } catch (error) {
+            console.error("Erro ao excluir pacote:", error);
+            return res.status(500).json({ erro: 'Erro ao excluir pacote', detalhe: error });
+        }
+    }
 }
