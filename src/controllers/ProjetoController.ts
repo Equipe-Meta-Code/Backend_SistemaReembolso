@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import ProjetoModel from "../models/ProjetoModel";
 import CategoriaModel from "../models/CategoriaModel";
 import DepartamentoModel from "../models/DepartamentoModel";
+import UserModel from "../models/UserModel";
 
 export default class ProjetoController {
   async create(req: Request, res: Response) {
@@ -133,6 +134,44 @@ export default class ProjetoController {
     } catch (error) {
       console.error('Erro ao encerrar projeto:', error);
       res.status(500).json({ error: 'Erro ao encerrar projeto.' });
+    }
+  }
+
+  async adicionarFuncionario(req: Request, res: Response) {
+    try {
+      const { projetoId } = req.params;
+      const { funcionarioId } = req.body;
+
+      if (!funcionarioId) {
+        return res.status(400).json({ error: 'ID do funcionário é obrigatório.' });
+      }
+
+      const projeto = await ProjetoModel.findOne({ projetoId });
+      if (!projeto) {
+        return res.status(404).json({ error: 'Projeto não encontrado.' });
+      }
+
+      const funcionario = await UserModel.findOne({ _id: funcionarioId });
+      if (!funcionario) {
+        return res.status(404).json({ error: 'Funcionário não encontrado.' });
+      }
+
+      if (projeto.funcionarios.some(f => f.userId === funcionario.userId)) {
+        return res.status(400).json({ error: 'Funcionário já está no projeto.' });
+      }
+
+
+      projeto.funcionarios.push({
+        _id: funcionario._id,
+        name: funcionario.name,
+        userId: funcionario.userId,
+      });
+
+      await projeto.save();
+      return res.status(200).json(projeto);
+    } catch (err) {
+      console.error('Erro ao adicionar funcionário:', err);
+      return res.status(500).json({ error: 'Erro ao adicionar funcionário.' });
     }
   }
   
