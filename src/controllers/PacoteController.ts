@@ -14,6 +14,7 @@ export default class PacoteController {
                 return res.status(400).json({ erro: 'Já existe um pacote com esse nome nesse projeto' });
             }*/
 
+            // Criar novo pacote
             const pacote = await PacoteModel.create({
                 nome,
                 projetoId,
@@ -24,7 +25,12 @@ export default class PacoteController {
 
             res.status(201).json(pacote);
         } catch (error) {
-            res.status(500).json({ erro: 'Erro ao criar pacote', detalhe: error });
+            console.error("Erro ao criar pacote:", error);
+            res.status(500).json({
+                error: 'Erro ao criar pacote',
+                detalhe: error,
+                alertType: 'error', // Alerta de erro
+            });
         }
     };
 
@@ -102,30 +108,61 @@ export default class PacoteController {
     }
 
     async updateStatus(req: Request, res: Response) {
-        try {
-          const { id } = req.params;
-          const { status } = req.body;
-      
-          if (!['Aprovado', 'Recusado'].includes(status)) {
-            return res.status(400).json({ erro: 'Status inválido' });
-          }
-      
-          const pacote = await PacoteModel.findOneAndUpdate(
-            { pacoteId: Number(id) },
-            { status },
-            { new: true }
-          );
-      
-          if (!pacote) {
-            return res.status(404).json({ erro: 'Pacote não encontrado' });
-          }
-      
-          res.status(200).json(pacote);
-        } catch (error) {
-          res
-            .status(500)
-            .json({ erro: 'Erro ao atualizar status do pacote', detalhe: error });
+    try {
+      const pacoteId = Number(req.params.pacoteId);
+      const { status } = req.body;
+      const validStatuses = [
+        "Aguardando Aprovação",
+        "Aprovado",
+        "Recusado",
+        "Aprovado Parcialmente",
+      ];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ erro: "Status inválido" });
+      }
+      const pacote = await PacoteModel.findOneAndUpdate(
+        { pacoteId },
+        { status },
+        { new: true }
+      );
+
+      if (!pacote) {
+        return res.status(404).json({ erro: "Pacote não encontrado" });
+      }
+      return res.status(200).json(pacote);
+    } catch (error) {
+      console.error("Erro ao atualizar status do pacote:", error);
+      return res
+        .status(500)
+        .json({ erro: "Erro ao atualizar status do pacote", detalhe: error });
+    }
+  }
+
+    // excluir pacote 
+    async delete(req: Request, res: Response) {
+    try {
+        const pacoteId = Number(req.params.pacoteId);
+
+        const pacote = await PacoteModel.findOne({ pacoteId });
+
+        if (!pacote) {
+        return res.status(404).json({ erro: 'Pacote não encontrado' });
         }
+
+        if (pacote.status !== 'Rascunho') {
+        return res.status(400).json({ erro: 'Somente pacotes com status "Rascunho" podem ser excluídos' });
+        }
+
+        // Exclui despesas vinculadas (opcional, caso deseje limpar)
+        await DespesaModel.deleteMany({ despesaId: { $in: pacote.despesas } });
+
+        await PacoteModel.deleteOne({ pacoteId });
+
+        return res.status(200).json({ mensagem: 'Pacote excluído com sucesso' });
+    } catch (error) {
+        console.error("Erro ao excluir pacote:", error);
+        return res.status(500).json({ erro: 'Erro ao excluir pacote', detalhe: error });
+    }
     }
 
 }

@@ -7,37 +7,59 @@ import DepartamentoController from "../controllers/DepartamentoController";
 import CategoriaController from "../controllers/CategoriaController";
 import PacoteController from "../controllers/PacoteController";
 import ImageController from "../controllers/ImageController";
-import pool from '../config/database'; // Importe o pool se ainda não estiver importado
+import NotificacaoController from '../controllers/NotificacaoController';
 import { RowDataPacket } from 'mysql2';
 const express = require('express');
 import { Request, Response } from 'express';
+import ComprovanteController from '../controllers/ComprovanteController';
 
 const router = express.Router();
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // até 10MB
+  fileFilter: (_req, file, cb) => {
+    if (
+      file.mimetype.startsWith('image/') ||
+      file.mimetype === 'application/pdf'
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error('Somente imagens (jpeg/png) e PDF são permitidos'));
+    }
+  }
+});
 
 const despesaController = new DespesaController();
 const projetoController = new ProjetoController();
 const departamentoController = new DepartamentoController();
 const categoriaController = new CategoriaController();
 const pacoteController = new PacoteController();
-
+const notificacaoController = new NotificacaoController();
 
 interface ImageRow extends RowDataPacket {
     foto: Buffer;
 }
 
-// Rotas de upload de imagem
+router.post('/upload', upload.single('file'), ImageController.salvarImagem);
+
+// Rotas de upload de imagem de perfil
 router.post('/imagem', upload.single('profileImage'), ImageController.salvarImagem);
 router.get('/imagens/:id', ImageController.buscarPorId);
 router.get('/imagens/:tipo/:tipoId', ImageController.buscarPorTipoId);
+
+// Rotas de upload de comprovantes
+router.post('/uploadcomprovante', upload.single('receipt'), ComprovanteController.salvarComprovante);
+router.get('/comprovantes/:tipo/:tipoId', ComprovanteController.buscarPorTipoId);
+router.get('/comprovantes/:id(\\d+)', ComprovanteController.buscarPorId);
 
 // Rotas de pacotes
 router.post('/pacote', pacoteController.create);
 router.get("/pacote", pacoteController.getAll);
 router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
-router.put('/pacote/:id/status', pacoteController.updateStatus);
+router.put('/pacote/:pacoteId/status', pacoteController.updateStatus);
+router.delete('/pacotes/:pacoteId', pacoteController.delete);
 
 // Rotas de Despesas
 router.post("/despesa", despesaController.create);
@@ -65,7 +87,24 @@ router.delete('/categorias/:id', categoriaController.delete);
 // Rotas do Usuário
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
+
+router.post("/verify-2fa", UserController.verify2FA);
+router.post("/resend-code", UserController.resendCode);
+router.post("/toggle2FA", isAuthenticated, UserController.toggle2FA);
+
+router.post("/recuperar-senha", UserController.recuperarSenha);
+router.post("/verificar-codigo", UserController.verificarCodigo);
+router.put('/atualizar-senha', UserController.atualizarSenha);
+
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
+
+router.post("/loginWeb", UserController.loginWeb);
+router.post("/verifyWeb", UserController.verifyWeb);
+
+// Rotas de Notificações
+router.post('/notifications', notificacaoController.create);
+router.get('/notifications', notificacaoController.getAll);
+router.patch('/notifications/:id', notificacaoController.update);
 
 export { router };
