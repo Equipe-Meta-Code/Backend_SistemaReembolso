@@ -60,6 +60,7 @@ router.post('/pacotes/:pacoteId/enviar', pacoteController.enviarPacote);
 router.get('/pacotes/:pacoteId/detalhes', pacoteController.getPacoteComDespesas);
 router.put('/pacote/:pacoteId/status', pacoteController.updateStatus);
 router.delete('/pacotes/:pacoteId', pacoteController.delete);
+router.put('/pacotes/:pacoteId', pacoteController.update);
 
 // Rotas de Despesas
 router.post("/despesa", despesaController.create);

@@ -184,4 +184,33 @@ export default class PacoteController {
             return res.status(500).json({ erro: 'Erro ao excluir pacote', detalhe: error });
         }
     }
+
+    // editar pacote
+    async update(req: Request, res: Response) {
+        try {
+            const pacoteId = Number(req.params.pacoteId);
+            const { nome } = req.body;
+
+            if (!nome) {
+                return res.status(400).json({ erro: 'Nome é obrigatório' });
+            }
+
+            console.log('Buscando pacoteId:', pacoteId);
+            const pacote = await PacoteModel.findOne({ pacoteId });
+            console.log('Pacote encontrado:', pacote);
+
+            if (!pacote) {
+                return res.status(404).json({ erro: 'Pacote não encontrado' });
+            }
+
+            pacote.nome = nome;
+            await pacote.save();
+
+            res.status(200).json({ mensagem: 'Nome atualizado com sucesso', pacote });
+        } catch (error) {
+            console.error("Erro ao atualizar nome do pacote:", error);
+            res.status(500).json({ erro: 'Erro ao atualizar nome do pacote', detalhe: error });
+        }
+    }
+
 }
