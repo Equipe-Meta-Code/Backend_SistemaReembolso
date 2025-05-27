@@ -90,9 +90,15 @@ router.delete('/categorias/:id', categoriaController.delete);
 // Rotas do Usuário
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
+
 router.post("/verify-2fa", UserController.verify2FA);
 router.post("/resend-code", UserController.resendCode);
 router.post("/toggle2FA", isAuthenticated, UserController.toggle2FA);
+
+router.post("/recuperar-senha", UserController.recuperarSenha);
+router.post("/verificar-codigo", UserController.verificarCodigo);
+router.put('/atualizar-senha', UserController.atualizarSenha);
+
 router.get("/profile", isAuthenticated, UserController.profile);
 router.get("/userList", UserController.userList);
 
