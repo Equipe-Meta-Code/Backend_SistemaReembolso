@@ -3,7 +3,7 @@ import NotificacaoModel, { INotificacao } from "../models/NotificacaoModel";
 
 export default class NotificacaoController {
   async create(req: Request, res: Response) {
-    const { userId, title, body, date, read = false, despesaId } = req.body;
+    const { userId, title, body, date, read = false, pacoteId } = req.body;
 
     try {
       const notificacao = await NotificacaoModel.create({
@@ -12,7 +12,7 @@ export default class NotificacaoController {
         body,
         date: date ? new Date(date) : undefined,
         read,
-        despesaId,
+        pacoteId,
       } as Partial<INotificacao>);
       return res.status(201).json({ message: "Notificação criada com sucesso", alertType: "success", notificacao });
     } catch (error) {
@@ -36,7 +36,7 @@ export default class NotificacaoController {
     const updates: Partial<INotificacao> = {};
 
     if (req.body.read !== undefined) updates.read = req.body.read;
-    if (req.body.despesaId !== undefined) updates.despesaId = req.body.despesaId;
+    if (req.body.pacoteId !== undefined) updates.pacoteId = req.body.pacoteId;
 
     try {
       const updated = await NotificacaoModel.findByIdAndUpdate(id, updates, { new: true });

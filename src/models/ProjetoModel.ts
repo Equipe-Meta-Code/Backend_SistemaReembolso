@@ -21,7 +21,13 @@ const ProjetoSchema = new mongoose.Schema({
   funcionarios: [{
     userId: { type: Number, required: true },
     name: { type: String, required: true }
-  }]
+  }],
+
+  status: {
+    type: String,
+    enum: ['ativo', 'encerrado'],
+    default: 'ativo',
+  },
   
 }, { timestamps: true });
 

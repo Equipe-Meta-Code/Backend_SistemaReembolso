@@ -8,7 +8,7 @@ export interface INotificacao extends mongoose.Document {
   body: string;
   date: Date;
   read: boolean;
-  despesaId: number;
+  pacoteId: mongoose.Types.ObjectId;  
 }
 
 const NotificacaoSchema = new mongoose.Schema<INotificacao>({
@@ -18,7 +18,7 @@ const NotificacaoSchema = new mongoose.Schema<INotificacao>({
   body:             { type: String, required: true },
   date:             { type: Date,   default: Date.now },
   read:             { type: Boolean, default: false },
-  despesaId:        { type: Number, required: true },
+  pacoteId:         { type: mongoose.Schema.Types.ObjectId, ref: 'Pacote', required: true },
 });
 
 NotificacaoSchema.plugin(AutoIncrement, { inc_field: "notificacaoId" });
